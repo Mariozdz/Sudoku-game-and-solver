@@ -14,7 +14,7 @@ type UseSudokuHook = {
   isCustomBoardOpen: boolean;
   setIsCustomBoardOpen: (value: boolean) => void;
   difficulty: string;
-  validateCellInput: (row: number, col: number, value: string) => boolean;
+  validateCellInput: (row: number, col: number, value: string) => any;
   error: { [key: string]: boolean };
 };
 
@@ -61,15 +61,12 @@ export function useSudoku(): UseSudokuHook {
 
   async function getBoardFromApi(difficulty?: Difficulty) {
     try {
-      const response: DosukuResponse = await fetch(
-        "https://sudoku-api.vercel.app/api/dosuku",
+      const response = await fetch(
+        `https://sudoku-api.vercel.app/api/dosuku?query=${SUDOKU_QUERY}`,
         {
           method: "GET",
-          query: JSON.stringify({ query: SUDOKU_QUERY }),
         }
-      ).then((response) => response.json() as DosukuResponse);
-
-      console.log(response);
+      ).then((response) => response.json());
 
       if (response.newboard.grids.length > 0) {
         const { value, solution, difficulty } = response.newboard.grids[0];
@@ -89,7 +86,7 @@ export function useSudoku(): UseSudokuHook {
     setBoard(baseBoard);
   }
 
-  function validateCellInput(row: number, col: number, value: string): boolean {
+  function validateCellInput(row: number, col: number, value: string) {
     if (!value) {
       return;
     }
