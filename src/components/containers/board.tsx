@@ -14,8 +14,8 @@ export function Sudoku() {
     resetGame,
     isCustomBoardOpen,
     setIsCustomBoardOpen,
-    validateCellInput,
     error,
+    handleChangeCellValue
   } = useSudoku();
 
   return (
@@ -28,6 +28,9 @@ export function Sudoku() {
       {/*  title="Create a new game to continue"*/}
       {/*/>*/}
 
+
+      {/* Move this section to an independent component after context is implemented
+        receive actions as an array of objects with label and action */}
       <div className="flex flex-row space-x-8">
         <ActionButton label="Generate" onClick={generateNewGame} />
         <ActionButton
@@ -37,6 +40,7 @@ export function Sudoku() {
         <ActionButton label="Auto solve" onClick={generateNewGame} />
         <ActionButton label="reset" onClick={resetGame} />
       </div>
+
       <div className="flex flex-col mt-10 border-black border-4">
         {baseArray.map((row) => {
           return (
@@ -51,16 +55,7 @@ export function Sudoku() {
                     row={row}
                     col={col}
                     onChangeValue={(event) => {
-                      const inputValue = event.target.value;
-
-                      const modifiedBoard = JSON.parse(JSON.stringify(board));
-
-                      modifiedBoard[row][col] = Number(inputValue);
-
-                      setBoard(modifiedBoard);
-
-                      if (inputValue)
-                        validateCellInput(row, col, event.target.value);
+                      handleChangeCellValue(event, row,col)
                     }}
                   />
                 );

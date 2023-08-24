@@ -4,6 +4,7 @@ import { GameStatus } from "../../shared/constants/game-status";
 import { BoardErrors } from "../../shared/types/i-board-errors";
 import { baseInitialBoard } from "../../shared/constants/base-initial-board";
 import { Difficulty } from "../../shared/constants/dificulty";
+import {getSudokuBoard} from "../../shared/api/get-sudoku-board";
 
 type UseSudokuHook = {
   board: Board;
@@ -14,38 +15,15 @@ type UseSudokuHook = {
   isCustomBoardOpen: boolean;
   setIsCustomBoardOpen: (value: boolean) => void;
   difficulty: string;
-  validateCellInput: (row: number, col: number, value: string) => any;
   error: { [key: string]: boolean };
+  handleChangeCellValue: (event: any , row: number, col: number) => void
 };
-
-type DosukuResponse = {
-  newboard: {
-    grids: [
-      {
-        value: Board;
-        solution: Board;
-        difficulty: string;
-      }
-    ];
-    results: number;
-    message: string;
-  };
-};
-
-const SUDOKU_QUERY = `
-  {
-     newboard(limit:1) {
-       grids {
-        value,
-        solution,
-        difficulty,
-       }
-     }
-  }`;
 
 const ERROR_LIMIT = 5;
 
 export function useSudoku(): UseSudokuHook {
+
+  // Move board attributes to context, that way sudoku-cell is not gonna need repetitive props to validate inputs
   const [board, setBoard] = useState<Board>(baseInitialBoard());
   const [baseBoard, setBaseBoard] = useState<Board>(baseInitialBoard());
   const [solutionBoard, setSolutionBoard] = useState<Board>(baseInitialBoard());
@@ -61,12 +39,7 @@ export function useSudoku(): UseSudokuHook {
 
   async function getBoardFromApi(difficulty?: Difficulty) {
     try {
-      const response = await fetch(
-        `https://sudoku-api.vercel.app/api/dosuku?query=${SUDOKU_QUERY}`,
-        {
-          method: "GET",
-        }
-      ).then((response) => response.json());
+      const response = await getSudokuBoard()
 
       if (response.newboard.grids.length > 0) {
         const { value, solution, difficulty } = response.newboard.grids[0];
@@ -86,15 +59,23 @@ export function useSudoku(): UseSudokuHook {
     setBoard(baseBoard);
   }
 
+  // Move this function to SudokuCell, its not board's responsibility to handle input change and validation
   function validateCellInput(row: number, col: number, value: string) {
+    const validationKey = `${row}${col}`;
+
     if (!value) {
-      return;
+
+      // Reset error when the input is empty
+      setErrors((prevValue) => {
+        return { ...prevValue, [validationKey]: false };
+      });
+      return true;
     }
 
     const parsedValue = Number(value);
 
-    const validationKey = `${row}${col}`;
 
+    // Reset Error if value is valid
     if (parsedValue === solutionBoard[row][col]) {
       if (error[validationKey]) {
         setErrors((prevValue) => {
@@ -105,6 +86,7 @@ export function useSudoku(): UseSudokuHook {
       return true;
     }
 
+    // Set error if input is invalid
     setErrors((prevValue) => {
       return { ...prevValue, [validationKey]: true };
     });
@@ -118,11 +100,24 @@ export function useSudoku(): UseSudokuHook {
     return false;
   }
 
+  // Move this function to SudokuCell, its not board's responsibility to handle input change and validation
+  function handleChangeCellValue(event: any, row: number, col: number) {
+    const inputValue = event.target.value;
+
+    const modifiedBoard = JSON.parse(JSON.stringify(board));
+
+    modifiedBoard[row][col] = Number(inputValue);
+
+    setBoard(modifiedBoard);
+
+    validateCellInput(row, col, event.target.value);
+  }
+
   useEffect(() => {
-    // getBoardFromApi().then(
-    //   () => {},
-    //   () => {}
-    // );
+    getBoardFromApi().then(
+      () => {},
+      () => {}
+    );
   }, []);
 
   useEffect(() => {
@@ -144,7 +139,7 @@ export function useSudoku(): UseSudokuHook {
     setBoard,
     generateNewGame: getBoardFromApi,
     resetGame,
-    validateCellInput,
+    handleChangeCellValue,
     error,
   };
 }
