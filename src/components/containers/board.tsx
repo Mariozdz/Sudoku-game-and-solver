@@ -21,15 +21,6 @@ export function Sudoku() {
 
   return (
     <div className="flex flex-col h-full w-full items-center justify-center px-10">
-      {/* Move this to an independent component*/}
-      {/*<Modal isOpen={isCustomBoardOpen} />*/}
-      {/*<Modal*/}
-      {/*  isOpen*/}
-      {/*  primaryAction={() => generateNewGame()}*/}
-      {/*  primaryActionLabel="Create new game"*/}
-      {/*  title="Create a new game to continue"*/}
-      {/*/>*/}
-
       {/* Move this section to an independent component after context is implemented
         receive actions as an array of objects with label and action */}
       <div className="flex flex-row space-x-8">
@@ -44,10 +35,10 @@ export function Sudoku() {
 
       {/*
       Check which value is changing for every cell, re rendering even after using memo
+      OnChangeValue is generating the re render try moving onChangeValue function to children and separate its logic from the board component
+      Investigate if key needs a better way to be set
+      Change baseArray var for board in context implementation
 
-      pending to try: discard lambda as function passed, it could re render every time due this,
-      refactor so every cell handle row and col in their own component instead of using values from
-      mapping
       */}
       <div className="flex flex-col mt-10 border-black border-4">
         {baseArray.map((row) => {
@@ -62,9 +53,7 @@ export function Sudoku() {
                     hasError={error[`${row}${col}`]}
                     row={row}
                     col={col}
-                    onChangeValue={(event) => {
-                      handleChangeCellValue(event, row, col);
-                    }}
+                    onChangeValue={handleChangeCellValue}
                   />
                 );
               })}

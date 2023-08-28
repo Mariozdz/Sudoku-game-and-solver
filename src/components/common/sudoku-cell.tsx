@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import React from "react";
+import { useTraceUpdate } from "../../shared/utils/use-trace-update";
 
 type SudokuCellProps = {
   cellValue: number;
@@ -8,7 +9,7 @@ type SudokuCellProps = {
   isDisabled: boolean;
   row: number;
   col: number;
-  onChangeValue: (event: any) => void;
+  onChangeValue: (event: any, row, col) => void;
 };
 
 function SudokuCellComponent({
@@ -19,7 +20,8 @@ function SudokuCellComponent({
   col,
   onChangeValue,
 }: SudokuCellProps) {
-  console.log("rerender");
+  useTraceUpdate({ cellValue, isDisabled, hasError, row, col, onChangeValue });
+
   return (
     <div
       className={clsx(
@@ -38,7 +40,7 @@ function SudokuCellComponent({
         value={cellValue !== 0 ? cellValue : ""}
         disabled={isDisabled}
         maxLength={1}
-        onChange={onChangeValue}
+        onChange={(event) => onChangeValue(event, row, col)}
       />
     </div>
   );

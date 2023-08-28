@@ -119,16 +119,6 @@ export function useSudoku(): UseSudokuHook {
     );
   }, []);
 
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     setCounter((prevState) => prevState + 1);
-  //   }, 1000);
-  //
-  //   return () => {
-  //     clearInterval(timer);
-  //   };
-  // }, []);
-
   return {
     board,
     baseBoard,
