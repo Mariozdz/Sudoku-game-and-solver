@@ -4,7 +4,7 @@ import { GameStatus } from "../../shared/constants/game-status";
 import { BoardErrors } from "../../shared/types/i-board-errors";
 import { baseInitialBoard } from "../../shared/constants/base-initial-board";
 import { Difficulty } from "../../shared/constants/dificulty";
-import {getSudokuBoard} from "../../shared/api/get-sudoku-board";
+import { getSudokuBoard } from "../../shared/api/get-sudoku-board";
 
 type UseSudokuHook = {
   board: Board;
@@ -16,14 +16,15 @@ type UseSudokuHook = {
   setIsCustomBoardOpen: (value: boolean) => void;
   difficulty: string;
   error: { [key: string]: boolean };
-  handleChangeCellValue: (event: any , row: number, col: number) => void
+  handleChangeCellValue: (event: any, row: number, col: number) => void;
 };
 
 const ERROR_LIMIT = 5;
 
 export function useSudoku(): UseSudokuHook {
+  // Replace for board attributes to context in src/context/board-context.tsx,
+  // that way sudoku-cell is not gonna need repetitive props to validate inputs
 
-  // Move board attributes to context, that way sudoku-cell is not gonna need repetitive props to validate inputs
   const [board, setBoard] = useState<Board>(baseInitialBoard());
   const [baseBoard, setBaseBoard] = useState<Board>(baseInitialBoard());
   const [solutionBoard, setSolutionBoard] = useState<Board>(baseInitialBoard());
@@ -39,7 +40,7 @@ export function useSudoku(): UseSudokuHook {
 
   async function getBoardFromApi(difficulty?: Difficulty) {
     try {
-      const response = await getSudokuBoard()
+      const response = await getSudokuBoard();
 
       if (response.newboard.grids.length > 0) {
         const { value, solution, difficulty } = response.newboard.grids[0];
@@ -54,7 +55,7 @@ export function useSudoku(): UseSudokuHook {
     }
   }
 
-  async function resetGame() {
+  function resetGame() {
     setErrors({});
     setBoard(baseBoard);
   }
@@ -64,7 +65,6 @@ export function useSudoku(): UseSudokuHook {
     const validationKey = `${row}${col}`;
 
     if (!value) {
-
       // Reset error when the input is empty
       setErrors((prevValue) => {
         return { ...prevValue, [validationKey]: false };
@@ -73,7 +73,6 @@ export function useSudoku(): UseSudokuHook {
     }
 
     const parsedValue = Number(value);
-
 
     // Reset Error if value is valid
     if (parsedValue === solutionBoard[row][col]) {
@@ -120,15 +119,15 @@ export function useSudoku(): UseSudokuHook {
     );
   }, []);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCounter((prevState) => prevState + 1);
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setCounter((prevState) => prevState + 1);
+  //   }, 1000);
+  //
+  //   return () => {
+  //     clearInterval(timer);
+  //   };
+  // }, []);
 
   return {
     board,

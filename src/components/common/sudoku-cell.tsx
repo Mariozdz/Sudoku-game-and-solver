@@ -1,16 +1,17 @@
 import clsx from "clsx";
+import React from "react";
 
 type SudokuCellProps = {
   cellValue: number;
   originalValue?: number;
-  hasError: { [key: string]: boolean };
+  hasError: boolean;
   isDisabled: boolean;
   row: number;
   col: number;
   onChangeValue: (event: any) => void;
 };
 
-export function SudokuCell({
+function SudokuCellComponent({
   cellValue,
   isDisabled,
   hasError,
@@ -18,6 +19,7 @@ export function SudokuCell({
   col,
   onChangeValue,
 }: SudokuCellProps) {
+  console.log("rerender");
   return (
     <div
       className={clsx(
@@ -31,7 +33,7 @@ export function SudokuCell({
         className={clsx(
           "appearance-none text-center text-lg outline-none border-none w-14 h-14",
           isDisabled && "bg-orange-200",
-          hasError[`${row}${col}`] && "bg-red-500"
+          hasError && "bg-red-500"
         )}
         value={cellValue !== 0 ? cellValue : ""}
         disabled={isDisabled}
@@ -41,3 +43,5 @@ export function SudokuCell({
     </div>
   );
 }
+
+export const SudokuCell = React.memo(SudokuCellComponent);
