@@ -1,26 +1,20 @@
 import clsx from "clsx";
 import React from "react";
-import { useTraceUpdate } from "../../shared/utils/use-trace-update";
+import { useTraceUpdate } from "../../../shared/utils/use-trace-update";
+import { useSudokuCell } from "./use-sudoku-cell";
 
 type SudokuCellProps = {
-  cellValue: number;
   originalValue?: number;
-  hasError: boolean;
   isDisabled: boolean;
   row: number;
   col: number;
-  onChangeValue: (event: any, row, col) => void;
 };
 
-function SudokuCellComponent({
-  cellValue,
-  isDisabled,
-  hasError,
-  row,
-  col,
-  onChangeValue,
-}: SudokuCellProps) {
-  useTraceUpdate({ cellValue, isDisabled, hasError, row, col, onChangeValue });
+function SudokuCellComponent({ isDisabled, row, col }: SudokuCellProps) {
+  const { handleChangeCellValue, hasError, value } = useSudokuCell({
+    row,
+    col,
+  });
 
   return (
     <div
@@ -37,10 +31,10 @@ function SudokuCellComponent({
           isDisabled && "bg-orange-200",
           hasError && "bg-red-500"
         )}
-        value={cellValue !== 0 ? cellValue : ""}
+        value={value !== 0 ? value : ""}
         disabled={isDisabled}
         maxLength={1}
-        onChange={(event) => onChangeValue(event, row, col)}
+        onChange={(event) => handleChangeCellValue(event, row, col)}
       />
     </div>
   );

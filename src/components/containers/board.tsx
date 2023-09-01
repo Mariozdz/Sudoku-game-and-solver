@@ -1,23 +1,13 @@
 import { useSudoku } from "./use-sudoku";
-import { Modal } from "../common/modal";
-import { SudokuCell } from "../common/sudoku-cell";
+import { SudokuCell } from "../common/sudoku-cell/sudoku-cell";
 import { ActionButton } from "../common/action-button";
 
 export function Sudoku() {
   // Pending: discard this and use board to render the board and its dimensions
   const baseArray = Array<number>(0, 1, 2, 3, 4, 5, 6, 7, 8);
 
-  const {
-    board,
-    baseBoard,
-    generateNewGame,
-    setBoard,
-    resetGame,
-    isCustomBoardOpen,
-    setIsCustomBoardOpen,
-    error,
-    handleChangeCellValue,
-  } = useSudoku();
+  const { baseBoard, generateNewGame, resetGame, setIsCustomBoardOpen } =
+    useSudoku();
 
   return (
     <div className="flex flex-col h-full w-full items-center justify-center px-10">
@@ -33,13 +23,6 @@ export function Sudoku() {
         <ActionButton label="reset" onClick={resetGame} />
       </div>
 
-      {/*
-      Check which value is changing for every cell, re rendering even after using memo
-      OnChangeValue is generating the re render try moving onChangeValue function to children and separate its logic from the board component
-      Investigate if key needs a better way to be set
-      Change baseArray var for board in context implementation
-
-      */}
       <div className="flex flex-col mt-10 border-black border-4">
         {baseArray.map((row) => {
           return (
@@ -47,13 +30,10 @@ export function Sudoku() {
               {baseArray.map((col) => {
                 return (
                   <SudokuCell
-                    key={`row[${row}][${col}]`}
-                    cellValue={board[row][col]}
+                    key={`board[${row}][${col}]`}
                     isDisabled={baseBoard[row][col] !== 0}
-                    hasError={error[`${row}${col}`]}
                     row={row}
                     col={col}
-                    onChangeValue={handleChangeCellValue}
                   />
                 );
               })}
